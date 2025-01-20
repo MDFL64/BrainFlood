@@ -1,3 +1,5 @@
+using System.Threading;
+
 struct Instr {
     public OpCode Op;
     public byte Inc;
@@ -117,7 +119,7 @@ class FastInterpreter {
         return bytecode;
     }
 
-    public static void Run(string code) {
+    public static void Run(string code, CancellationToken token) {
         var bytecode = Compile(code);
 
         int pc = 0;
@@ -126,7 +128,7 @@ class FastInterpreter {
 
         while (pc<bytecode.Count) {
             var c = bytecode[pc];
-            //Console.WriteLine("? "+c.Op+" "+c.Inc+" "+c.Offset);
+            token.ThrowIfCancellationRequested();
             switch (c.Op) {
                 case OpCode.UpdateCell:
                     //Console.WriteLine("pre "+data[ptr - c.Offset]);

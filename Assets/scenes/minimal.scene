@@ -31,7 +31,52 @@
       "Flags": 0,
       "Name": "BrainFlood",
       "Position": "149.3263,149.3264,-211.1794",
-      "Enabled": true
+      "Components": [
+        {
+          "__type": "BrainFlood",
+          "__guid": "747cf811-871d-44d2-bb4a-0c6514473ff0",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        }
+      ]
+    },
+    {
+      "__guid": "8409f0a2-62da-4ec7-93b2-bb3c059b3d93",
+      "Flags": 0,
+      "Name": "UI",
+      "Position": "-146.1756,-178.4593,151.8183",
+      "Enabled": true,
+      "Components": [
+        {
+          "__type": "Sandbox.BrainFloodUI",
+          "__guid": "65fd7ee0-474c-4913-893b-789608f763ee",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        },
+        {
+          "__type": "Sandbox.ScreenPanel",
+          "__guid": "9ccaf8c8-6aaa-425b-b659-8f5968e44fab",
+          "AutoScreenScale": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Opacity": 1,
+          "Scale": 1,
+          "ScaleStrategy": "ConsistentHeight",
+          "ZIndex": 100
+        }
+      ]
     }
   ],
   "SceneProperties": {

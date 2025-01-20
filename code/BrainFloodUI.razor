@@ -1,0 +1,68 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace Sandbox
+
+<root>
+	<div class="main">
+		<div class="half-panel">
+			<h2>Source</h2>
+			<div class="scroll-panel">
+				<TextEntry class="source" Multiline=@(true) Text=@Source OnTextEdited=@HandleEdit />
+			</div>
+		</div>
+		<div class="half-panel">
+			<h2>Output</h2>
+			<div class="scroll-panel output">
+				@(Output?.Text)
+			</div>
+		</div>
+	</div>
+	<div class="bottom">
+		<Button onclick=@Run>Run</Button>
+		<Button class="select" onclick=@(()=>{UseCompiler=false; Run();})>@RenderBubble(!UseCompiler) Interpreter</Button>
+		<Button class="select" onclick=@(()=>{UseCompiler=true; Run();})>@RenderBubble(UseCompiler) Compiler</Button>
+	</div>
+</root>
+
+@code
+{
+	GameObject Runner;
+
+	public string Source { get; set; } = FileSystem.Mounted.ReadAllText("mandelbrot.txt");
+	public Output Output = null;
+	public bool UseCompiler = false;
+
+	private string RenderBubble(bool b) {
+		return b ? "◉" : "◎";
+	}
+
+	public void HandleEdit(string text) {
+		Source = text;
+		Run();
+	}
+
+	public void Run() {
+		if (Runner != null && Runner.IsValid) {
+			Runner.Destroy();
+		}
+
+		Output = new Output();
+
+		var go = new GameObject();
+		go.Name = "Runner";
+		go.Parent = GameObject;
+		
+		var bf = go.AddComponent<BrainFlood>();
+		bf.Source = Source;
+		bf.Output = Output;
+		bf.UseCompiler = UseCompiler;
+
+		Runner = go;
+	}
+
+	/// <summary>
+	/// the hash determines if the system should be rebuilt. If it changes, it will be rebuilt
+	/// </summary>
+	protected override int BuildHash() => System.HashCode.Combine( UseCompiler, Output?.Text );
+}

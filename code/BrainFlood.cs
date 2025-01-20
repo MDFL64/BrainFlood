@@ -1,17 +1,60 @@
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using Sandbox;
 using Sandbox.Diagnostics;
 
+public class Output {
+    public string Text = "";
+}
+
 public sealed class BrainFlood : Component
 {
+    const int TIMEOUT = 200;
+
+    public string Source;
+    public Output Output;
+    public bool UseCompiler;
+
+    private CancellationTokenSource TokenSource;
+
 	protected override void OnStart()
 	{
-		var source = FileSystem.Mounted.ReadAllText("mandelbrot.txt");
-		var hell = new DynamicHell(source);
-		var sw = Stopwatch.StartNew();
+		//var hell = new DynamicHell(source);
+		//var sw = Stopwatch.StartNew();
 		//hell.Run();
-		FastInterpreter.Run(source);
-		Log.Info(">>> "+sw.Elapsed); 
+		//FastInterpreter.Run(source);
+		//Log.Info(">>> "+sw.Elapsed);
+        //Log.Info("~~");
+        //var b = GameTask.RunInThreadAsync(Boop);
+        //var a = b.GetAwaiter();
+        //Log.Info("await = "+a.);
+        //b.
+        //GameTask.WorkerThread().
+        //var t = new System.Threading.Thread(Boop);
+        Exec();
+	}
+
+    private async void Exec() {
+        await GameTask.WorkerThread();
+
+        TokenSource = new CancellationTokenSource();
+        TokenSource.CancelAfter(TIMEOUT);
+        var token = TokenSource.Token;
+        try {
+            FastInterpreter.Run(Source, token);
+        } catch (OperationCanceledException) {
+            Log.Info("exec cancelled");
+        } catch (Exception e) {
+            Log.Info("exception: "+e);
+        }
+    }
+
+	protected override void OnUpdate()
+	{
+        if (TokenSource != null) {
+            TokenSource.CancelAfter(TIMEOUT);
+        }
 	}
 }
 
