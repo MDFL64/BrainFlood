@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 struct Instr {
@@ -119,16 +121,20 @@ class FastInterpreter {
         return bytecode;
     }
 
-    public static void Run(string code, CancellationToken token) {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Run(string code, Output output) {
+        var sw = Stopwatch.StartNew();
         var bytecode = Compile(code);
+        output.WriteInfo("Compiled to bytecode in "+sw.Elapsed);
 
+        sw = Stopwatch.StartNew();
         int pc = 0;
         int ptr = 1000;
         var data = new byte[1_000_000];
 
         while (pc<bytecode.Count) {
             var c = bytecode[pc];
-            token.ThrowIfCancellationRequested();
+            output.CheckKill();
             switch (c.Op) {
                 case OpCode.UpdateCell:
                     //Console.WriteLine("pre "+data[ptr - c.Offset]);
@@ -153,7 +159,7 @@ class FastInterpreter {
                     }
                     break;
                 case OpCode.Output:
-                    Writer.WriteChar((char)data[ptr + c.Offset]);
+                    output.Text += (char)data[ptr + c.Offset];
                     break;
                 case OpCode.Zero:
                     data[ptr + c.Offset] = 0;
@@ -163,5 +169,6 @@ class FastInterpreter {
             }
             pc++;
         }
+        output.WriteInfo("Executed in "+sw.Elapsed);
     }
 }

@@ -13,9 +13,7 @@
 		</div>
 		<div class="half-panel">
 			<h2>Output</h2>
-			<div class="scroll-panel output">
-				@(Output?.Text)
-			</div>
+			<div class="scroll-panel output">@(Output?.Text)</div>
 		</div>
 	</div>
 	<div class="bottom">
@@ -23,6 +21,7 @@
 		<Button class="select" onclick=@(()=>{UseCompiler=false; Run();})>@RenderBubble(!UseCompiler) Interpreter</Button>
 		<Button class="select" onclick=@(()=>{UseCompiler=true; Run();})>@RenderBubble(UseCompiler) Compiler</Button>
 	</div>
+	<div class="info">@(Output?.Info)</div>
 </root>
 
 @code
@@ -52,7 +51,7 @@
 		var go = new GameObject();
 		go.Name = "Runner";
 		go.Parent = GameObject;
-		
+
 		var bf = go.AddComponent<BrainFlood>();
 		bf.Source = Source;
 		bf.Output = Output;
@@ -64,5 +63,5 @@
 	/// <summary>
 	/// the hash determines if the system should be rebuilt. If it changes, it will be rebuilt
 	/// </summary>
-	protected override int BuildHash() => System.HashCode.Combine( UseCompiler, Output?.Text );
+	protected override int BuildHash() => System.HashCode.Combine( UseCompiler, Output?.Text, Output?.Info );
 }

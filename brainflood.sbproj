@@ -1,11 +1,11 @@
 {
   "Title": "BrainFlood",
   "Type": "game",
-  "Org": "local",
+  "Org": "churchofmiku",
   "Ident": "brainflood",
   "Schema": 1,
   "IncludeSourceFiles": false,
-  "Resources": null,
+  "Resources": "mandelbrot.txt",
   "PackageReferences": [],
   "EditorReferences": null,
   "IsWhitelistDisabled": false,

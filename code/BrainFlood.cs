@@ -6,6 +6,19 @@ using Sandbox.Diagnostics;
 
 public class Output {
     public string Text = "";
+    public string Info = "";
+    public bool Kill = false;
+
+    public void WriteInfo(string s) {
+        Info += s;
+        Info += '\n';
+    }
+
+    public void CheckKill() {
+        if (Kill) {
+            throw new OperationCanceledException();
+        }
+    }
 }
 
 public sealed class BrainFlood : Component
@@ -16,33 +29,26 @@ public sealed class BrainFlood : Component
     public Output Output;
     public bool UseCompiler;
 
-    private CancellationTokenSource TokenSource;
-
 	protected override void OnStart()
 	{
-		//var hell = new DynamicHell(source);
-		//var sw = Stopwatch.StartNew();
-		//hell.Run();
-		//FastInterpreter.Run(source);
-		//Log.Info(">>> "+sw.Elapsed);
-        //Log.Info("~~");
-        //var b = GameTask.RunInThreadAsync(Boop);
-        //var a = b.GetAwaiter();
-        //Log.Info("await = "+a.);
-        //b.
-        //GameTask.WorkerThread().
-        //var t = new System.Threading.Thread(Boop);
         Exec();
 	}
 
     private async void Exec() {
         await GameTask.WorkerThread();
 
-        TokenSource = new CancellationTokenSource();
-        TokenSource.CancelAfter(TIMEOUT);
-        var token = TokenSource.Token;
         try {
-            FastInterpreter.Run(Source, token);
+            if (UseCompiler) {
+                var sw = Stopwatch.StartNew();
+                var hell = new DynamicHell(Source);
+                Output.WriteInfo("Compiled type in "+sw.Elapsed);
+                
+                sw = Stopwatch.StartNew();
+                hell.Run(Output);
+                Output.WriteInfo("Executed in "+sw.Elapsed);
+            } else {
+                FastInterpreter.Run(Source, Output);
+            }
         } catch (OperationCanceledException) {
             Log.Info("exec cancelled");
         } catch (Exception e) {
@@ -50,23 +56,11 @@ public sealed class BrainFlood : Component
         }
     }
 
-	protected override void OnUpdate()
+	protected override void OnDestroy()
 	{
-        if (TokenSource != null) {
-            TokenSource.CancelAfter(TIMEOUT);
+        if (Output != null) {
+            Output.Kill = true;
         }
-	}
-}
-
-public class Writer {
-	static string BUFFER = "";
-	public static void WriteChar(char c) {
-		if (c == '\n') {
-			Log.Info(BUFFER);
-			BUFFER = "";
-			return;
-		}
-		BUFFER += c;
 	}
 }
 
@@ -164,9 +158,9 @@ class DynamicHell {
         Root = op;
     }
 
-    public void Run() {
+    public void Run(Output output) {
         int ptr = 1000;
         var data = new byte[1_000_000];
-        Root.Run(ptr,data);
+        Root.Run(ptr,data,output);
     }
 }
