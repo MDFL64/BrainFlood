@@ -88,7 +88,15 @@ class DynamicFlood {
     }
 
     private static Type MakeGeneric(Type base_ty, Type[] args) {
-		return TypeLibrary.GetType(base_ty).MakeGenericType(args);
+        for (int i=0;i<100;i++) {
+            var bty = TypeLibrary.GetType(base_ty);
+            if (bty == null) {
+                Log.Info("retry "+base_ty);
+                continue;
+            }
+            return bty.MakeGenericType(args);
+        }
+        throw new Exception("bad basetype "+base_ty);
 	}
 
     private static Type GetDigit(int n) {
