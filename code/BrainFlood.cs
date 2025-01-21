@@ -40,7 +40,7 @@ public sealed class BrainFlood : Component
         try {
             if (UseCompiler) {
                 var sw = Stopwatch.StartNew();
-                var hell = new DynamicHell(Source);
+                var hell = new DynamicFlood(Source);
                 Output.WriteInfo("Compiled type in "+sw.Elapsed);
                 
                 sw = Stopwatch.StartNew();
@@ -64,8 +64,32 @@ public sealed class BrainFlood : Component
 	}
 }
 
-class DynamicHell {
+class DynamicFlood {
     private Op Root;
+
+    public DynamicFlood(string code) {
+        var bytecode = FastInterpreter.Compile(code);
+        int index = bytecode.Count-1;
+
+        var op_ty = BuildInner(bytecode,ref index);
+
+        var op = TypeLibrary.Create<Op>(op_ty);
+        if (op == null) {
+            throw new Exception("failed to create op");
+        }
+
+        Root = op;
+    }
+
+    public void Run(Output output) {
+        int ptr = 1000;
+        var data = new byte[1_000_000];
+        Root.Run(ptr,data,output);
+    }
+
+    private static Type MakeGeneric(Type base_ty, Type[] args) {
+		return TypeLibrary.GetType(base_ty).MakeGenericType(args);
+	}
 
     private static Type GetDigit(int n) {
         switch (n) {
@@ -88,10 +112,6 @@ class DynamicHell {
         }
         throw new Exception("die");
     }
-
-	private static Type MakeGeneric(Type base_ty, Type[] args) {
-		return TypeLibrary.GetType(base_ty).MakeGenericType(args);
-	}
 
     private static Type GenerateConst(int n) {
         if (n < 0) {
@@ -142,25 +162,5 @@ class DynamicHell {
         }
 
         return result;
-    }
-
-    public DynamicHell(string code) {
-        var bytecode = FastInterpreter.Compile(code);
-        int index = bytecode.Count-1;
-
-        var op_ty = BuildInner(bytecode,ref index);
-
-        var op = TypeLibrary.Create<Op>(op_ty);
-        if (op == null) {
-            throw new Exception("failed to create op");
-        }
-
-        Root = op;
-    }
-
-    public void Run(Output output) {
-        int ptr = 1000;
-        var data = new byte[1_000_000];
-        Root.Run(ptr,data,output);
     }
 }
