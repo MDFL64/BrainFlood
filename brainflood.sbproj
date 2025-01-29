@@ -8,7 +8,7 @@
   "Resources": "mandelbrot.txt",
   "PackageReferences": [],
   "EditorReferences": null,
-  "IsWhitelistDisabled": false,
+  "IsWhitelistDisabled": true,
   "Metadata": {
     "MaxPlayers": 64,
     "MinPlayers": 1,

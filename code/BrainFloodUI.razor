@@ -18,8 +18,9 @@
 	</div>
 	<div class="bottom">
 		<Button onclick=@Run>Run</Button>
-		<Button class="select" onclick=@(()=>{UseCompiler=false; Run();})>@RenderBubble(!UseCompiler) Interpreter</Button>
-		<Button class="select" onclick=@(()=>{UseCompiler=true; Run();})>@RenderBubble(UseCompiler) Compiler</Button>
+		<Button class="select" onclick=@(()=>{SelectedExecutor=Executor.Interpreter; Run();})>@RenderBubble(SelectedExecutor == Executor.Interpreter) Interpreter</Button>
+		<Button class="select" onclick=@(()=>{SelectedExecutor=Executor.Compiler; Run();})>@RenderBubble(SelectedExecutor == Executor.Compiler) Compiler</Button>
+		<Button class="select" onclick=@(()=>{SelectedExecutor=Executor.LinqExpression; Run();})>@RenderBubble(SelectedExecutor == Executor.LinqExpression) LINQ Expression</Button>
 	</div>
 	<div class="info">@(Output?.Info)</div>
 </root>
@@ -30,7 +31,7 @@
 
 	public string Source { get; set; } = FileSystem.Mounted.ReadAllText("mandelbrot.txt");
 	public Output Output = null;
-	public bool UseCompiler = false;
+	public Executor SelectedExecutor = Executor.Interpreter;
 
 	private string RenderBubble(bool b) {
 		return b ? "◉" : "◎";
@@ -55,7 +56,7 @@
 		var bf = go.AddComponent<BrainFlood>();
 		bf.Source = Source;
 		bf.Output = Output;
-		bf.UseCompiler = UseCompiler;
+		bf.SelectedExecutor = SelectedExecutor;
 
 		Runner = go;
 	}
@@ -63,5 +64,5 @@
 	/// <summary>
 	/// the hash determines if the system should be rebuilt. If it changes, it will be rebuilt
 	/// </summary>
-	protected override int BuildHash() => System.HashCode.Combine( UseCompiler, Output?.Text, Output?.Info );
+	protected override int BuildHash() => System.HashCode.Combine( SelectedExecutor, Output?.Text, Output?.Info );
 }

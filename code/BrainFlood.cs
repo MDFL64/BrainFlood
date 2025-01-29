@@ -1,12 +1,18 @@
 using System.Diagnostics;
 
+public enum Executor {
+    Interpreter,
+    Compiler,
+    LinqExpression
+}
+
 public sealed class BrainFlood : Component
 {
     const int TIMEOUT = 200;
 
     public string Source;
     public Output Output;
-    public bool UseCompiler;
+    public Executor SelectedExecutor;
 
 	protected override void OnStart()
 	{
@@ -17,10 +23,18 @@ public sealed class BrainFlood : Component
         await GameTask.WorkerThread();
 
         try {
-            if (UseCompiler) {
+            if (SelectedExecutor == Executor.Compiler) {
                 var sw = Stopwatch.StartNew();
                 var hell = new DynamicFlood(Source);
                 Output.WriteInfo("Compiled type in "+sw.Elapsed);
+                
+                sw = Stopwatch.StartNew();
+                hell.Run(Output);
+                Output.WriteInfo("Executed in "+sw.Elapsed);
+            } else if (SelectedExecutor == Executor.LinqExpression) {
+                var sw = Stopwatch.StartNew();
+                var hell = new ExprFlood(Source);
+                Output.WriteInfo("Compiled expression in "+sw.Elapsed);
                 
                 sw = Stopwatch.StartNew();
                 hell.Run(Output);
