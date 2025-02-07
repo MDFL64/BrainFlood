@@ -32,6 +32,7 @@ public sealed class BrainFlood : Component
                 hell.Run(Output);
                 Output.WriteInfo("Executed in "+sw.Elapsed);
             } else if (SelectedExecutor == Executor.LinqExpression) {
+                #if DISABLE_WHITELIST
                 var sw = Stopwatch.StartNew();
                 var hell = new ExprFlood(Source);
                 Output.WriteInfo("Compiled expression in "+sw.Elapsed);
@@ -39,6 +40,9 @@ public sealed class BrainFlood : Component
                 sw = Stopwatch.StartNew();
                 hell.Run(Output);
                 Output.WriteInfo("Executed in "+sw.Elapsed);
+                #else
+                throw new Exception("linq expressions blocked by whitelist");
+                #endif
             } else {
                 FastInterpreter.Run(Source, Output);
             }

@@ -20,7 +20,9 @@
 		<Button onclick=@Run>Run</Button>
 		<Button class="select" onclick=@(()=>{SelectedExecutor=Executor.Interpreter; Run();})>@RenderBubble(SelectedExecutor == Executor.Interpreter) Interpreter</Button>
 		<Button class="select" onclick=@(()=>{SelectedExecutor=Executor.Compiler; Run();})>@RenderBubble(SelectedExecutor == Executor.Compiler) Compiler</Button>
-		<Button class="select" onclick=@(()=>{SelectedExecutor=Executor.LinqExpression; Run();})>@RenderBubble(SelectedExecutor == Executor.LinqExpression) LINQ Expression</Button>
+		@if (SHOW_LINQ) {
+			<Button class="select" onclick=@(()=>{SelectedExecutor=Executor.LinqExpression; Run();})>@RenderBubble(SelectedExecutor == Executor.LinqExpression) LINQ Expression</Button>
+		}
 	</div>
 	<div class="info">@(Output?.Info)</div>
 </root>
@@ -32,6 +34,12 @@
 	public string Source { get; set; } = FileSystem.Mounted.ReadAllText("mandelbrot.txt");
 	public Output Output = null;
 	public Executor SelectedExecutor = Executor.Interpreter;
+
+	#if DISABLE_WHITELIST
+	const bool SHOW_LINQ = true;
+	#else
+	const bool SHOW_LINQ = false;
+	#endif
 
 	private string RenderBubble(bool b) {
 		return b ? "◉" : "◎";

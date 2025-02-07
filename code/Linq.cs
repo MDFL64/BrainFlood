@@ -1,4 +1,4 @@
-using System.IO;
+#if DISABLE_WHITELIST
 using System.Linq.Expressions;
 
 class ExprVars {
@@ -102,3 +102,4 @@ public class ExprFlood {
         return Expression.Block(children);
     }
 }
+#endif
